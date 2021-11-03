@@ -15,7 +15,6 @@
 from __future__ import unicode_literals
 
 import datetime
-import itertools
 import re
 import uuid
 from time import sleep
@@ -28,7 +27,6 @@ from django.db import connection, IntegrityError, transaction
 from django.db.models import Q, Count, Prefetch, Sum
 from django.db.models.deletion import ProtectedError
 from django.test import TestCase
-from django.utils import six
 from django.utils.timezone import utc
 
 from versions.exceptions import DeletionOfNonCurrentVersionError
@@ -760,18 +758,13 @@ class OneToManyTest(TestCase):
         team = Team.objects.as_of(t1).first()
         self.assertEqual(2, team.player_set.count())
         for player in team.player_set.all():
-            self.assertNotEqual(u'p1.v2', six.u(str(player.name)))
+            self.assertNotEqual(u'p1.v2', str(player.name))
 
         # at t2 there must be a 2 players and on of them is named 'p1.v2'
         team = Team.objects.as_of(t2).first()
         self.assertEqual(2, team.player_set.count())
-
-        if six.PY2:
-            matches = itertools.ifilter(lambda x: x.name == 'p1.v2',
-                                        team.player_set.all())
-        if six.PY3:
-            matches = filter(lambda x: x.name == 'p1.v2',
-                             team.player_set.all())
+        matches = filter(lambda x: x.name == 'p1.v2',
+                        team.player_set.all())
         self.assertEqual(1, len(list(matches)))
 
     def test_adding_one_more_player_to_the_team(self):
@@ -949,12 +942,8 @@ class SelfOneToManyTest(TestCase):
         self.assertEqual(2, parentdir_at_t2.directory_set.count())
 
         # ... and one of then is named 'subdir1.v2'
-        if six.PY2:
-            matches = itertools.ifilter(lambda x: x.name == 'subdir1.v2',
-                                        parentdir_at_t2.directory_set.all())
-        if six.PY3:
-            matches = filter(lambda x: x.name == 'subdir1.v2',
-                             parentdir_at_t2.directory_set.all())
+        matches = filter(lambda x: x.name == 'subdir1.v2',
+                         parentdir_at_t2.directory_set.all())
         self.assertEqual(1, len(list(matches)))
 
     def test_adding_more_subdir(self):

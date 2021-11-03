@@ -2,7 +2,6 @@
 from django.db.models import CharField, IntegerField, Model, ForeignKey, \
     CASCADE
 from django.db.models.deletion import DO_NOTHING, PROTECT, SET, SET_NULL
-from django.utils.encoding import python_2_unicode_compatible
 
 from versions.fields import VersionedManyToManyField, VersionedForeignKey
 from versions.models import Versionable
@@ -41,14 +40,12 @@ class B(Versionable):
 # - DetachTest
 # - DeferredFieldsTest
 # – VersionedAdminTest
-@python_2_unicode_compatible
 class City(Versionable):
     name = CharField(max_length=200)
 
     __str__ = versionable_description
 
 
-@python_2_unicode_compatible
 class Team(Versionable):
     name = CharField(max_length=200)
     city = VersionedForeignKey(City, null=True, on_delete=CASCADE)
@@ -56,7 +53,7 @@ class Team(Versionable):
     __str__ = versionable_description
 
 
-@python_2_unicode_compatible
+
 class Player(Versionable):
     name = CharField(max_length=200)
     team = VersionedForeignKey(Team, null=True, on_delete=CASCADE)
@@ -69,7 +66,7 @@ class Award(Versionable):
     players = VersionedManyToManyField(Player, related_name='awards')
 
 
-@python_2_unicode_compatible
+
 class Mascot(Versionable):
     name = CharField(max_length=200)
     team = VersionedForeignKey(Team, null=False, on_delete=CASCADE)
@@ -81,7 +78,7 @@ def default_team():
     return Team.objects.current.get(name__startswith='default_team.')
 
 
-@python_2_unicode_compatible
+
 class Fan(Versionable):
     name = CharField(max_length=200)
     team = VersionedForeignKey(Team, null=False, on_delete=SET(default_team))
@@ -89,7 +86,7 @@ class Fan(Versionable):
     __str__ = versionable_description
 
 
-@python_2_unicode_compatible
+
 class RabidFan(Versionable):
     name = CharField(max_length=200)
     team = VersionedForeignKey(Team, null=True, on_delete=SET_NULL)
@@ -97,7 +94,7 @@ class RabidFan(Versionable):
     __str__ = versionable_description
 
 
-@python_2_unicode_compatible
+
 class WizardFan(Versionable):
     name = CharField(max_length=200)
     team = VersionedForeignKey(Team, null=True, on_delete=PROTECT)
@@ -105,7 +102,7 @@ class WizardFan(Versionable):
     __str__ = versionable_description
 
 
-@python_2_unicode_compatible
+
 class NonFan(Versionable):
     name = CharField(max_length=200)
     team = VersionedForeignKey(Team, null=False, on_delete=DO_NOTHING)
@@ -122,7 +119,7 @@ class Directory(Versionable):
 
 # ############################################
 # MultiM2MTest models
-@python_2_unicode_compatible
+
 class Professor(Versionable):
     name = CharField(max_length=200)
     address = CharField(max_length=200)
@@ -131,7 +128,7 @@ class Professor(Versionable):
     __str__ = versionable_description
 
 
-@python_2_unicode_compatible
+
 class Classroom(Versionable):
     name = CharField(max_length=200)
     building = CharField(max_length=200)
@@ -139,7 +136,7 @@ class Classroom(Versionable):
     __str__ = versionable_description
 
 
-@python_2_unicode_compatible
+
 class Student(Versionable):
     name = CharField(max_length=200)
     professors = VersionedManyToManyField("Professor", related_name='students')
@@ -150,7 +147,7 @@ class Student(Versionable):
 
 ############################################
 # MultiM2MToSameTest models
-@python_2_unicode_compatible
+
 class Pupil(Versionable):
     name = CharField(max_length=200)
     phone_number = CharField(max_length=200)
@@ -162,7 +159,7 @@ class Pupil(Versionable):
     __str__ = versionable_description
 
 
-@python_2_unicode_compatible
+
 class Teacher(Versionable):
     name = CharField(max_length=200)
     domain = CharField(max_length=200)
@@ -172,7 +169,7 @@ class Teacher(Versionable):
 
 ############################################
 # ManyToManyFilteringTest models
-@python_2_unicode_compatible
+
 class C1(Versionable):
     name = CharField(max_length=50)
     c2s = VersionedManyToManyField("C2", related_name='c1s')
@@ -180,7 +177,7 @@ class C1(Versionable):
     __str__ = versionable_description
 
 
-@python_2_unicode_compatible
+
 class C2(Versionable):
     name = CharField(max_length=50)
     c3s = VersionedManyToManyField("C3", related_name='c2s')
@@ -188,7 +185,7 @@ class C2(Versionable):
     __str__ = versionable_description
 
 
-@python_2_unicode_compatible
+
 class C3(Versionable):
     name = CharField(max_length=50)
 
@@ -197,14 +194,14 @@ class C3(Versionable):
 
 ############################################
 # HistoricM2MOperationsTests models
-@python_2_unicode_compatible
+
 class Observer(Versionable):
     name = CharField(max_length=200)
 
     __str__ = versionable_description
 
 
-@python_2_unicode_compatible
+
 class Subject(Versionable):
     name = CharField(max_length=200)
     observers = VersionedManyToManyField('Observer', related_name='subjects')
@@ -238,7 +235,7 @@ class Color(Versionable):
 
 ############################################
 # IntegrationNonVersionableModelsTests models
-@python_2_unicode_compatible
+
 class Wine(Model):
     name = CharField(max_length=200)
     vintage = IntegerField()
@@ -248,7 +245,7 @@ class Wine(Model):
             self.name) + " (" + str(self.vintage) + ")>"
 
 
-@python_2_unicode_compatible
+
 class WineDrinker(Versionable):
     name = CharField(max_length=200)
     glass_content = ForeignKey(Wine, related_name='drinkers', null=True,
@@ -257,7 +254,7 @@ class WineDrinker(Versionable):
     __str__ = versionable_description
 
 
-@python_2_unicode_compatible
+
 class WineDrinkerHat(Model):
     shape_choices = [('Sailor', 'Sailor'),
                      ('Cloche', 'Cloche'),

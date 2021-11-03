@@ -1,3 +1,6 @@
+import operator
+from functools import partial, reduce
+from django.db.models import query_utils
 from django.db.models.deletion import (
     attrgetter, signals, sql, transaction,
     CASCADE,
@@ -146,21 +149,21 @@ class VersionedCollector(Collector):
                 else:
                     setattr(instance, model._meta.pk.attname, None)
 
-    def related_objects(self, related, objs):
+    def related_objects(self, related_model, related_fields, objs):
         """
         Gets a QuerySet of current objects related to ``objs`` via the
         relation ``related``.
         """
         from versions.models import Versionable
 
-        related_model = related.related_model
+        predicate = reduce(operator.or_, (
+            query_utils.Q(**{'%s__in' % related_field.name: objs})
+            for related_field in related_fields
+        ))
         if issubclass(related_model, Versionable):
-            qs = related_model.objects.current
+            return related_model.objects.current.using(self.using).filter(predicate)
         else:
-            qs = related_model._base_manager.all()
-        return qs.using(self.using).filter(
-            **{"%s__in" % related.field.name: objs}
-        )
+            return related_model._base_manager.using(self.using).filter(predicate)
 
     def versionable_pre_delete(self, instance, timestamp):
         """

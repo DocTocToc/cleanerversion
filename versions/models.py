@@ -26,7 +26,6 @@ from django.db.models.query import QuerySet, ModelIterable
 from django.db.models.sql.datastructures import Join
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import WhereNode
-from django.utils import six
 from django.utils.timezone import utc
 
 from versions.exceptions import DeletionOfNonCurrentVersionError
@@ -391,7 +390,9 @@ class VersionedQuery(Query):
             self._querytime_filter_added = True
         return super(VersionedQuery, self).get_compiler(*args, **kwargs)
 
-    def build_filter(self, filter_expr, **kwargs):
+    def build_filter(self, filter_expr, branch_negated=False,
+                     current_negated=False, can_reuse=None, allow_joins=True,
+                     split_subq=True, check_filterable=True):
         """
         When a query is filtered with an expression like
         .filter(team=some_team_object), where team is a VersionedForeignKey
@@ -434,13 +435,26 @@ class VersionedQuery(Query):
         :param kwargs:
         :return: tuple
         """
+        if isinstance(filter_expr, Q):
+            return self._add_q(
+                filter_expr,
+                branch_negated=branch_negated,
+                current_negated=current_negated,
+                used_aliases=can_reuse,
+                allow_joins=allow_joins,
+                split_subq=split_subq,
+                check_filterable=check_filterable,
+            )
         lookup, value = filter_expr
         if self.querytime.active \
                 and isinstance(value, Versionable) and not value.is_latest:
             new_lookup = \
                 lookup + LOOKUP_SEP + Versionable.OBJECT_IDENTIFIER_FIELD
             filter_expr = (new_lookup, value.identity)
-        return super(VersionedQuery, self).build_filter(filter_expr, **kwargs)
+        return super(VersionedQuery, self).build_filter(filter_expr,
+            branch_negated=False, current_negated=False,
+            can_reuse=None, allow_joins=True, split_subq=True,
+            check_filterable=True)
 
     def add_immediate_loading(self, field_names):
         # TODO: Decide, whether we always want versionable fields to be loaded,
@@ -751,7 +765,7 @@ class Versionable(models.Model):
         if versions_settings.VERSIONS_USE_UUIDFIELD:
             return uuid_value
         else:
-            return six.u(str(uuid_value))
+            return str(uuid_value)
 
     def _clone_at(self, timestamp):
         """

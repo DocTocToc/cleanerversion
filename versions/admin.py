@@ -5,7 +5,7 @@ from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.admin.checks import ModelAdminChecks
 from django.contrib.admin.options import get_content_type_for_model
-from django.contrib.admin.templatetags.admin_static import static
+from django.contrib.admin import static
 from django.contrib.admin.utils import unquote
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.core.exceptions import PermissionDenied

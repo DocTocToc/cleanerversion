@@ -50,8 +50,8 @@ Prerequisites
 
 This code was tested with the following technical components
 
-* Python 2.7 & 3.6
-* Django 1.11 & 2.0
+* Python 3.8
+* Django 2.2 & 3.2
 * PostgreSQL 9.3.4 & SQLite3
 
 Older Django versions
