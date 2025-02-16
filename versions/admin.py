@@ -12,7 +12,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.html import format_html
 from django.utils.http import urlquote
 from django.utils.text import capfirst
@@ -198,7 +198,7 @@ class VersionedAdmin(admin.ModelAdmin):
 
         opts = self.model._meta
         msg_dict = {
-            'name': force_text(opts.verbose_name),
+            'name': force_str(opts.verbose_name),
             'obj': format_html('<a href="{}">{}</a>',
                                urlquote(request.path), obj),
         }
@@ -279,10 +279,10 @@ class VersionedAdmin(admin.ModelAdmin):
         ctx = self.admin_site.each_context(request)
 
         context = dict(ctx,
-                       title=('Change history: %s') % force_text(obj),
+                       title=('Change history: %s') % force_str(obj),
                        action_list=action_list,
                        module_name=capfirst(
-                           force_text(opts.verbose_name_plural)),
+                           force_str(opts.verbose_name_plural)),
                        object=obj,
                        opts=opts,
                        preserved_filters=self.get_preserved_filters(request),
