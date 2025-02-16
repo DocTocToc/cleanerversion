@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django import forms
-from django.conf.urls import url
+from django.urls import re_path
 from django.contrib import admin, messages
 from django.contrib.admin.checks import ModelAdminChecks
 from django.contrib.admin.options import get_content_type_for_model
@@ -298,10 +298,10 @@ class VersionedAdmin(admin.ModelAdmin):
         """
         Appends the custom will_not_clone url to the admin site
         """
-        not_clone_url = [url(r'^(.+)/will_not_clone/$',
+        not_clone_url = [re_path(r'^(.+)/will_not_clone/$',
                              admin.site.admin_view(self.will_not_clone))]
         restore_url = [
-            url(r'^(.+)/restore/$', admin.site.admin_view(self.restore))]
+            re_path(r'^(.+)/restore/$', admin.site.admin_view(self.restore))]
         return not_clone_url + restore_url + super(VersionedAdmin,
                                                    self).get_urls()
 
