@@ -16,7 +16,7 @@ from django.utils.encoding import force_str
 from django.utils.html import format_html
 from urllib.parse import quote
 from django.utils.text import capfirst
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 class DateTimeFilterForm(forms.Form):
